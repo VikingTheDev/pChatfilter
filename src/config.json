@@ -1,0 +1,26 @@
+{
+    "lists": 
+    [
+        [
+            "Message contains word from ban list",
+            "word1",
+            "word2"
+        ],
+        [
+            "Message contains word from kick list",
+            "word3",
+            "word4"
+        ],
+        [
+            "Message contains word from warn list",
+            "word5",
+            "word6"
+        ]
+    ],
+    "settings": 
+    {
+        "staff_role_id": "767803636926906419",
+        "log_channel_webhookurl": "/api/webhooks/767792052502790150/GnI12MEsfB76IELPIy51VrR2Nt399CtL1i1_qF2dpVzs6ICs6xIGX2K5ZbOkuCzjtPlO"
+    }
+
+}
