@@ -1,9 +1,5 @@
 const config = require ("./src/config.json");
 const https = require("https");
-const { emit } = require("process");
-
-
-const msg = "this message contains Word3"
 
 const options = {
     //settings for the discord post request
@@ -18,38 +14,51 @@ const options = {
   };
   
 onNet("chatMessage", (src, author, text) => {
-  checkLists(text, cb => {
-    console.log(cb)
-  })
+  checkMsg(src, text);
 });
 
-on("pChatfilter:messageSent", (src, author, msg) => {
-  checkLists(msg, cb => {
-    console.log(cb)
+function checkMsg (src, text, callb) {
+  checkLists(text, cb => {
+    switch (true) {
+      case cb[1] == 0: {
+        if (cb[0] == true) {
+          kickUser(src, text);
+          callb(true)
+          break;
+        }
+      }
+      case cb[1] == 1: {
+        if (cb[0] == true) {
+          warnUser(src, text);
+          callb(true)
+          break;
+        }
+      }
+      default: {
+        callb(false)
+      }
+    }
   })
-})
+}
 
 function checkLists (msg, cb) {
   for (let i = 0; i < config.lists.length; i++) {
-      let logMsg;
-      cb([checkArray(msg, config.lists[i], callback => {
-          logMsg = callback;
-      }), i, logMsg])
+      cb([checkArray(msg, config.lists[i]), i])
   }
 }
 
-function checkArray (msg, array, callback) {
-  for (let i = 1; i < array.length; i++) {
+function checkArray (msg, array) {
+  for (let i = 0; i < array.length; i++) {
       if (msg.toLowerCase().includes(array[i])) {
-          callback(array[0])
           return true
       }
   }
   return false
 }
 
-function warnUser(src, author, text) {
+function warnUser(src, text) {
   CancelEvent();
+  let name = GetPlayerName(src);
   setImmediate(() => {
       emitNet("chat:addMessage", src, {
       color: [255, 0, 0],
@@ -59,19 +68,20 @@ function warnUser(src, author, text) {
       ],
       });
   });
-  dNotif(src, author, text, "Warning");
+  dNotif(src, name, text, "Warning");
 }
   
-function kickUser(src, author, text) {
+function kickUser(src, text) {
   CancelEvent();
+  let name = GetPlayerName(src);
   DropPlayer(src, "Sending a message containing a prohibited word");
-  dNotif(src, author, text, "Kick, might require a manual ban");
+  dNotif(src, name, text, "Kick, might require a manual ban");
 }
   
-function dNotif(src, user, message, tier) {
+function dNotif(src, name, message, tier) {
   var embed = {
     title: `A user sent a message containing a prohibited word!`,
-    description: `Username: ${src} | ${user} \n Message: ${message} \n Automatic action taken: ${tier} \n`,
+    description: `Username: ${src} | ${name} \n Message: ${message} \n Automatic action taken: ${tier} \n`,
     color: 15158332,
     fields: [
       /*  name: "Identifiers",
@@ -87,7 +97,7 @@ function dNotif(src, user, message, tier) {
     username: "SSRP | Chat Filter",
     avatar_url:
       "https://media.discordapp.net/attachments/562656258415525898/571040114277613598/officialssrplogo.png?width=677&height=677",
-    content: "<@&508886727297859587>",
+    content: `<@&${config.settings.staff_role_id}>`,
     embeds: [embed],
   };
   var data = JSON.stringify(params);
@@ -105,85 +115,8 @@ function dNotif(src, user, message, tier) {
   req.write(data);
   req.end();
 }
-exports("execFilter", (src, author, text) => {
-  text = text.toLowerCase();
-  CancelEvent();
-  switch (true) {
-    case text.includes(filterList.kickList1):
-      kickUser(src, author, text);
-      return 1;
-    case text.includes(filterList.kickList2):
-      kickUser(src, author, text);
-      return 1;
-    case text.includes(filterList.warnList1):
-      warnUser(src, author, text);
-      return 1;
-    case text.includes(filterList.warnList2):
-      warnUser(src, author, text);
-      return 1;
-    case text.includes(filterList.warnList3):
-      warnUser(src, author, text);
-      return 1;
-    case text.includes(filterList.warnList4):
-      warnUser(src, author, text);
-      return 1;
-    default:
-      return 0;
-  }
-
-  function warnUser(src, author, text) {
-    setImmediate(() => {
-      emitNet("chat:addMessage", src, {
-        color: [255, 0, 0],
-        args: [
-          "Server",
-          "^1Please ensure your choice of words abide by our server rules. Thank you!",
-        ],
-      });
-    });
-    dNotif(src, author, text, "Warning");
-  }
-
-  function kickUser(src, author, text) {
-    DropPlayer(src, "Sending a message containing a prohibited word");
-    dNotif(src, author, text, "Kick, might require a manual ban");
-  }
-
-  function dNotif(src, user, message) {
-    var embed = {
-      title: `A user sent a message containing a prohibited word!`,
-      description: `Username: ${src} | ${user} \n Message: ${message} \n Automatic action taken: ${tier} \n`,
-      color: 15158332,
-      fields: [
-        /*  name: "Identifiers",
-          value: "Might be added in the future",
-        },*/
-      ],
-      footer: {
-        text: "pChatfilter | Made by Petrikov",
-        timestamp: Date.now(),
-      },
-    };
-    var params = {
-      username: "SSRP | Chat Filter",
-      avatar_url:
-        "https://media.discordapp.net/attachments/562656258415525898/571040114277613598/officialssrplogo.png?width=677&height=677",
-      content: "<@&508886727297859587>",
-      embeds: [embed],
-    };
-    var data = JSON.stringify(params);
-
-    const req = https.request(options, (res) => {
-      console.log(`statusCode: ${res.statusCode}`);
-
-      res.on("data", (d) => {
-        process.stdout.write(d);
-      });
-    });
-    req.on("error", (error) => {
-      console.error(error);
-    });
-    req.write(data);
-    req.end();
-  }
+exports("execFilter", (src, text) => {
+  checkMsg(src, text, callb => {
+    return callb;
+  });
 });

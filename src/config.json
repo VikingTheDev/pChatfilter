@@ -2,19 +2,12 @@
     "lists": 
     [
         [
-            "Message contains word from ban list",
             "word1",
             "word2"
         ],
         [
-            "Message contains word from kick list",
             "word3",
             "word4"
-        ],
-        [
-            "Message contains word from warn list",
-            "word5",
-            "word6"
         ]
     ],
     "settings": 
