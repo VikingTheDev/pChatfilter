@@ -1,0 +1,14 @@
+{
+    "webhookUrl": "",
+    "staffRole": "",
+    "lists": {
+        "kick": [
+            "verybadword",
+            "extremelybadword"
+        ],
+        "warn": [
+            "slightlybadword",
+            "kindabadword"
+        ]
+    }
+}
