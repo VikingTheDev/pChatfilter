@@ -74,7 +74,7 @@ function dNotif(obj: obj): void {
     var params = {
       username: "SSRP | Chat Filter",
       avatar_url:
-        "https://media.discordapp.net/attachments/562656258415525898/571040114277613598/officialssrplogo.png?width=677&height=677",
+        "https://cdn.discordapp.com/attachments/741017756291301431/818265837827129404/nx4jf8ry1fy51.png",
       content: `<@&${staffRole}>`,
       embeds: [embed],
     };
