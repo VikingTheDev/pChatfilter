@@ -26,6 +26,7 @@ interface obj {
 }
 
 function checkMsg (src: string, msg: string): void {
+    msg = msg.toLowerCase();
     for(const tier in lists) {
         for(const i in lists[tier]) {
             if(msg.includes(lists[tier][i])) {
