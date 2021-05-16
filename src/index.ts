@@ -14,7 +14,8 @@ const options = {
 };
 
 onNet("chatMessage", (src: string, author: string, text: string) => {
-    checkMsg(src, text);
+    //@ts-expect-error
+    checkMsg(src, text, cb => {});
 });
 
 interface obj {
@@ -36,7 +37,7 @@ let list = {
   }
 }
 
-function checkMsg (src: string, message: string, cb?: any): void {
+function checkMsg (src: string, message: string, cb: any): void {
     let msg = message.toLowerCase();
     let bool = false;
     for(const tier of list) {
@@ -110,15 +111,15 @@ function dNotif(obj: obj): void {
 }
 
 function getIdentifiers(src:string): string {
-  let test: string;
+  let x: string;
   for(let i = 0; i < GetNumPlayerIdentifiers(src); i++) {
     if(i === 0) {
-      test = GetPlayerIdentifier(src, i);
+      x = GetPlayerIdentifier(src, i);
     } else {
-      test = test + `\n${GetPlayerIdentifier(src, i)}`
+      x = x + `\n${GetPlayerIdentifier(src, i)}`
     }
   }
-  return test;
+  return x;
 }
 
 // Cfx stuff
