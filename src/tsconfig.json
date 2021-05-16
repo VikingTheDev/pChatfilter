@@ -3,13 +3,14 @@
         "baseUrl": ".",
         "paths": { "*": ["types/*"] },
         "outDir": "./",
-        "noImplicitAny": false,
+        "noImplicitAny": true,
         "module": "es6",
-        "target": "es6",
+        "target": "es2017",
         "allowJs": true,
         "lib": ["es2017"],
-        "types": ["@citizenfx/server", "@citizenfx/client", "node"],
-        "moduleResolution": "node"
+        "types": ["@citizenfx/server", "node"],
+        "moduleResolution": "node",
+        "resolveJsonModule": true
     },
     "include": [
         "./**/*"

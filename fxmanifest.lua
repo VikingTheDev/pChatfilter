@@ -10,4 +10,4 @@ webpack_config 'server.config.js'
 
 author 'Petrikov'
 description 'Filters out vulgar language'
-version '2.0.0'
+version '2.0.1'

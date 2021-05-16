@@ -1,5 +1,5 @@
-const { webhookUrl, staffRole, lists } = require('./config.chatfilter.json');
-const https = require("https");
+import {webhookUrl, staffRole, blacklistedWords} from './config.chatfilter.json'
+import * as https from 'https';
 
 const options = {
     //settings for the discord post request
@@ -13,7 +13,7 @@ const options = {
     },
 };
 
-onNet("chatMessage", (src: string, author, text: string) => {
+onNet("chatMessage", (src: string, author: string, text: string) => {
     checkMsg(src, text);
 });
 
@@ -25,19 +25,31 @@ interface obj {
     identifiers: string;
 }
 
-function checkMsg (src: string, msg: string): void {
-    msg = msg.toLowerCase();
-    for(const tier in lists) {
-        for(const i in lists[tier]) {
-            if(msg.includes(lists[tier][i])) {
-                if(tier === "kick") {
+let list = {
+  kick: blacklistedWords.kick,
+  warn: blacklistedWords.warn,
+  [Symbol.iterator]: function* () {
+    let properties = Object.keys(this);
+    for (let i of properties) {
+        yield [i, this[i]];
+    }
+  }
+}
+
+function checkMsg (src: string, message: string, cb?: any): void {
+    let msg = message.toLowerCase();
+    let bool = false;
+    for(const tier of list) {
+        for(const word of tier[1]) {
+            if(msg.includes(word)) {
+                if(tier[0] === "kick") {
                     CancelEvent();
                     let name = GetPlayerName(src);
                     let identifiers: string = getIdentifiers(src);
                     DropPlayer(src, "Sending a message containing a prohibited word")
-                    dNotif({ src, name, msg, tier, identifiers});
-
-                } else if (tier === "warn") {
+                    dNotif({ src, name, msg, tier: tier[0], identifiers});
+                    bool = true;
+                } else if (tier[0] === "warn") {
                     CancelEvent();
                     let name = GetPlayerName(src);
                     setImmediate(() => {
@@ -49,11 +61,13 @@ function checkMsg (src: string, msg: string): void {
                         ],
                         });
                     });
-                    dNotif({ src, name, msg, tier, identifiers: getIdentifiers(src)});
+                    dNotif({ src, name, msg, tier: tier[0], identifiers: getIdentifiers(src)});
+                    bool = true;
                 }
             } 
         }
     }
+    cb(bool)
 }
 
 function dNotif(obj: obj): void {
@@ -81,14 +95,14 @@ function dNotif(obj: obj): void {
     };
     var data = JSON.stringify(params);
   
-    const req = https.request(options, (res) => {
+    const req = https.request(options, (res: any) => {
       console.log(`statusCode: ${res.statusCode}`);
   
-      res.on("data", (d) => {
+      res.on("data", (d: any) => {
         process.stdout.write(d);
       });
     });
-    req.on("error", (error) => {
+    req.on("error", (error: any) => {
       console.error(error);
     });
     req.write(data);
@@ -106,3 +120,13 @@ function getIdentifiers(src:string): string {
   }
   return test;
 }
+
+// Cfx stuff
+const exp = (<any>global).exports;
+
+exp('checkMsg', (src: string, message: string, callback: any) => {
+  //@ts-ignore
+  checkMsg(src, message, cb => {
+    callback(cb)
+  });
+})
