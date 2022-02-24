@@ -1,13 +1,8 @@
 fx_version 'cerulean'
 game 'gta5'
 
-server_script "dist/index.js"
-
-dependency 'yarn'
-dependency 'webpack'
-
-webpack_config 'server.config.js'
+server_script "src/index.js"
 
 author 'Petrikov'
 description 'Filters out vulgar language'
-version '2.0.1'
+version '2.1.0'
